@@ -24,3 +24,46 @@ subcommands provided by one script. Currently there is:
 Defaults:
 - device size: 2GiB
 - zone size: 256MiB
+
+# Quick start
+
+```
+# ./nullb setup
+INFO: setup module and mounts
+```
+
+If that succeeds, the module has been loaded and the configfs is available.
+
+```
+# ./nullb create
+INFO: Create nullb0
+INFO: name=nullb0
+INFO: size=2048M zone_size=256M
+/dev/nullb0
+```
+
+The INFO messages are for clarity when run interactively, for scripting the
+last line contains the name of the device node that's been created.
+
+```
+# ./nullb ls
+INFO: device nodes:
+/dev/nullb0
+INFO: created devices:
+No  Name      Device                   Size    Zone size  On
+ 0  nullb0    /dev/nullb0             2048M         256M   1
+```
+
+The null block device nodes and the actual name in sysfs can be different so
+both are printed, though this script keeps both names respecting the index and
+name matches the device node filename.
+
+```
+# ./nullb rm nullb0
+INFO: check mounts
+INFO: removing nullb0
+```
+
+Mount checks just lists all mounts using the device but won't stop the removal.
+It should fail if the device is in use, otherwise the device and its resources
+are released after the command ends.
