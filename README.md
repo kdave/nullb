@@ -67,3 +67,14 @@ INFO: removing nullb0
 Mount checks just lists all mounts using the device but won't stop the removal.
 It should fail if the device is in use, otherwise the device and its resources
 are released after the command ends.
+
+# Trivia
+
+- the `null_blk` driver exists since kernel 3.12, zoned support has been
+  added in 4.19 but please use at least *5.10* as a good base with improvements
+  and fixes
+- the device data are backed by memory, reasonable size should be used for the 'size'
+- zone sizes must be a power of two, eg. 4MiB works
+- you can use the 'nullb' devices with 'btrfs' and have fun testing
+- use `blkzone` utility to 'report' or 'reset' zones on the device
+- https://zonedstorage.io
