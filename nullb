@@ -55,13 +55,20 @@ function _check_setup() {
 	fi
 }
 
+function _check_cd() {
+	if ! [ -d "$1" ]; then
+		_error "$1 not accessible"
+	fi
+	cd "$1"
+}
+
 function _find_free_index() {
-	cd "$SYSFS"
+	_check_cd "$SYSFS"
 	found=-1
 	for index in `seq 0 1 10`; do
 		_dbg "index $index"
 		ok=true
-		for dir in $(ls -df1 *); do
+		for dir in $(ls -df1 * 2>/dev/null); do
 			if ! [ -d "$dir" ]; then
 				continue
 			fi
@@ -138,9 +145,9 @@ if [ "$CMD" = 'create' ]; then
 	# size in MB
 	zonesize=$(_parse_zone_size "$@")
 	_msg "Create nullb$index"
-	cd "$SYSFS"
+	_check_cd "$SYSFS"
 	if mkdir "$name"; then
-		cd "$name"
+		_check_cd "$name"
 		echo "$size" > size
 		echo 1 > zoned
 		echo 1 > memory_backed
@@ -159,9 +166,9 @@ fi
 
 if [ "$CMD" = 'ls' -o "$CMD" = 'list' ]; then
 	_msg "device nodes:"
-	ls /dev/nullb*
+	ls /dev/nullb* 2>/dev/null
 	_msg "created devices:"
-	cd "$SYSFS"
+	_check_cd "$SYSFS"
 	printf '%-2s  %-8s  %-16s  %11s  %11s  %-2s
 '	\
 		"No"				\
@@ -170,7 +177,7 @@ if [ "$CMD" = 'ls' -o "$CMD" = 'list' ]; then
 		"Size"				\
 		"Zone size"			\
 		"On"
-	for dir in $(ls -df1 *); do
+	for dir in $(ls -df1 * 2>/dev/null); do
 		[ -d "$dir" ] || continue
 		printf '%2d  %-8s  %-16s  %10dM  %10dM  %2d
 '	\
@@ -184,7 +191,7 @@ if [ "$CMD" = 'ls' -o "$CMD" = 'list' ]; then
 fi
 
 if [ "$CMD" = 'rm' -o "$CMD" = 'delete' ]; then
-	cd "$SYSFS"
+	_check_cd "$SYSFS"
 	name="$2"
 	_dbg "deleting $name"
 	if [ -d "$name" ]; then
