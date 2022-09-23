@@ -72,7 +72,7 @@ function _check_cd() {
 function _find_free_index() {
 	_check_cd "$SYSFS"
 	found=-1
-	for index in `seq 0 1 10`; do
+	for index in `seq 0 1 100`; do
 		_dbg "index $index"
 		ok=true
 		for dir in $(ls -df1 * 2>/dev/null); do
