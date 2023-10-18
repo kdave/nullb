@@ -16,9 +16,10 @@ function print_help() {
 	echo "  For more see 'modinfo null_blk', most apply to all new devices, you may want to tweak the"
 	echo "  individual devices upon creation."
 	echo ""
-	echo "nullb create [-s sizeMB] [-z zonesizeMB]"
+	echo "nullb create [-s sizeMB] [-z zonesizeMB] [-c zonecapacityMB]"
 	echo "- create a new device with given sizes (in megabytes), allocating the first free index,"
 	echo "  device is /dev/nullb\$index"
+	echo "- optionally for ZNS set the capacity (zone capacity <= zone size, default is zone size)."
 	echo ""
 	echo "nullb ls"
 	echo "nullb list"
@@ -148,6 +149,24 @@ function _parse_zone_size() {
 	echo -en "$zonesize"
 }
 
+function _parse_zone_capacity() {
+	local zonecapacity="$ZONESIZE"
+	_dbg "parse zone capacity $@"
+	while [ $# -gt 0 ]; do
+		_dbg "ARG: $1"
+		if [ "$1" = '-c' ]; then
+			zonecapacity="$2"
+			if [ -z "$zonecapacity" ]; then
+				_error "-c requires size"
+			fi
+			shift
+		fi
+		shift
+	done
+
+	echo -en "$zonecapacity"
+}
+
 # main()
 
 if [ "$CMD" = 'help' ]; then
@@ -173,6 +192,8 @@ if [ "$CMD" = 'create' ]; then
 	size=$(_parse_device_size "$@")
 	# size in MB
 	zonesize=$(_parse_zone_size "$@")
+	# size in MB
+	zonecapacity=$(_parse_zone_capacity "$@")
 	_msg "Create nullb$index"
 	_check_cd "$SYSFS"
 	if mkdir "$name"; then
@@ -181,6 +202,9 @@ if [ "$CMD" = 'create' ]; then
 		echo 1 > zoned
 		echo 1 > memory_backed
 		echo "$zonesize" > zone_size
+		if [ -f "zone_capacity" ]; then
+			echo "$zonecapacity" > zone_capacity
+		fi
 		echo 1 > power
 		node=$(cat "$SYSFS/$name/index")
 		node="nullb${node}"
