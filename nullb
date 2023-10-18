@@ -9,8 +9,12 @@ function print_help() {
 	echo ""
 	echo "Commands:"
 	echo ""
-	echo "nullb setup"
-	echo "- load required modules and mount configfs"
+	echo "nullb setup [module options]"
+	echo "- load required modules and mount configfs, optionally specify module options for null_blk.ko:"
+	echo "  - nr_devices - number of pre-created device nodes (default: 0)"
+	echo ""
+	echo "  For more see 'modinfo null_blk', most apply to all new devices, you may want to tweak the"
+	echo "  individual devices upon creation."
 	echo ""
 	echo "nullb create [-s sizeMB] [-z zonesizeMB]"
 	echo "- create a new device with given sizes (in megabytes), allocating the first free index,"
@@ -152,9 +156,12 @@ if [ "$CMD" = 'help' ]; then
 fi
 
 if [ "$CMD" = 'setup' ]; then
-	_msg "setup module and mounts"
+	declare -a options
+	shift
+	options=("nr_devices=0" "$@")
+	_msg "setup module and mounts (module options: ${options[@]})"
 	modprobe configfs
-	modprobe null_blk nr_devices=0
+	modprobe null_blk "${options[@]}"
 	_check_setup
 fi
 
