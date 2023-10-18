@@ -15,7 +15,9 @@ The script follows common command line interface when there are multiple
 subcommands provided by one script. Currently there is:
 
 * **nullb setup** - load required modules and mount configfs
-* **nullb create [-s sizeMB] [-z zonesizeMB]** - create a new device with given sizes, allocating the first free indes, device is /dev/nullb$index
+* **nullb create [-s sizeMB] [-z zonesizeMB] [-c zonecapacityMB]** - create a
+  new device with given sizes, allocating the first free indes, device is
+  /dev/nullb$index
 * **nullb ls**
 * **nullb list** - show table of created null\_blk devices, size and zone sizes
 * **nullb rm NAME**
@@ -50,8 +52,8 @@ last line contains the name of the device node that's been created.
 INFO: device nodes:
 /dev/nullb0
 INFO: created devices:
-No  Name      Device                   Size    Zone size  On
- 0  nullb0    /dev/nullb0             2048M         256M   1
+No  Name      Device                   Size    Zone size  Zone capacity  On  Mount
+ 0  nullb0    /dev/nullb0             2048M         256M           200M   1  /mnt/test
 ```
 
 The null block device nodes and the actual name in sysfs can be different so

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Simple management of null_blk devices, useful for zoned device testing
 # Run 'nullb help' for how to use it
-Version="0.1"
+Version="0.2"
 
 function print_help() {
 	echo "Simple management of null_blk devices, useful for zoned device testing"
