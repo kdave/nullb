@@ -198,25 +198,31 @@ if [ "$CMD" = 'ls' -o "$CMD" = 'list' ]; then
 	ls /dev/nullb* 2>/dev/null
 	_msg "created devices:"
 	_check_cd "$SYSFS"
-	printf '%-2s  %-8s  %-16s  %11s  %11s  %-2s  %-8s
+	printf '%-2s  %-8s  %-16s  %11s  %11s  %13s  %-2s  %-8s
 '	\
 		"No"				\
 		"Name"				\
 		"Device"			\
 		"Size"				\
 		"Zone size"			\
+		"Zone capacity"			\
 		"On"				\
 		"Mount"
 	for dir in $(ls -df1 * 2>/dev/null); do
 		[ -d "$dir" ] || continue
 		DEV="/dev/nullb"$(cat "$dir/index")
-		printf '%2d  %-8s  %-16s  %10dM  %10dM  %2d  %-8s
+		capacity=$(cat "$dir/zone_size")
+		if [ -f "$dir/zone_capacity" ]; then
+			capacity=$(cat "$dir/zone_capacity")
+		fi
+		printf '%2d  %-8s  %-16s  %10dM  %10dM  %12dM  %2d  %-8s
 '	\
 			$(cat "$dir/index")			\
 			"$dir"					\
 			"$DEV"					\
 			$(cat "$dir/size")			\
 			$(cat "$dir/zone_size")			\
+			"$capacity"				\
 			$(cat "$dir/power")			\
 			$(findmnt -o TARGET --noheadings "$DEV")
 	done
