@@ -1,24 +1,39 @@
 #!/bin/bash
 # Simple management of null_blk devices, useful for zoned device testing
-# Version: 0.1
+# Run 'nullb help' for how to use it
+Version="0.1"
+
+function print_help() {
+	echo "Simple management of null_blk devices, useful for zoned device testing"
+	echo "Version: $Version"
+	echo ""
+	echo "Commands:"
+	echo ""
+	echo "nullb setup"
+	echo "- load required modules and mount configfs"
+	echo ""
+	echo "nullb create [-s size] [-z zonesize]"
+	echo "- create a new device with given sizes, allocating the first free index,"
+	echo "  device is /dev/nullb\$index"
+	echo ""
+	echo "nullb ls"
+	echo "nullb list"
+	echo "- show table of created null_blk devices, size and zone sizes"
+	echo ""
+	echo "nullb rm NAME"
+	echo "nullb delete NAME"
+	echo "- delete existing null_blk device by name, must match the device node name"
+	echo "  like 'nullb0'"
+	exit 0
+}
+
+# Implemented commands:
 #
-# Commands:
-#
-# nullb setup
-# - load required modules and mount configfs
-#
-# nullb create [-s size] [-z zonesize]
-# - create a new device with given sizes, allocating the first free index,
-#   device is /dev/nullb$index
-#
-# nullb ls
-# nullb list
-# - show table of created null_blk devices, size and zone sizes
-#
-# nullb rm NAME
-# nullb delete NAME
-# - delete existing null_blk device by name, must match the device node name
-#   like 'nullb0'
+# help
+# create
+# list
+# delete
+# setup
 
 CMD="$1"
 DEBUG=false
@@ -27,11 +42,6 @@ DEBUG=false
 SIZE='2048'
 ZONESIZE='256'
 SYSFS='/sys/kernel/config/nullb'
-
-# create
-# list
-# delete
-# setup
 
 function _error() {
 	echo "ERROR: $@"
@@ -135,6 +145,11 @@ function _parse_zone_size() {
 }
 
 # main()
+
+if [ "$CMD" = 'help' ]; then
+	print_help
+	exit 0
+fi
 
 if [ "$CMD" = 'setup' ]; then
 	_msg "setup module and mounts"
